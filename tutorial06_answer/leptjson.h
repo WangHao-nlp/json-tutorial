@@ -1,46 +1,51 @@
 #ifndef LEPTJSON_H__
 #define LEPTJSON_H__
 
-#include <stddef.h> /* size_t */
+#include<stddef.h> // size_t
 
-typedef enum { LEPT_NULL, LEPT_FALSE, LEPT_TRUE, LEPT_NUMBER, LEPT_STRING, LEPT_ARRAY, LEPT_OBJECT } lept_type;
+typedef enum {
+	LEPT_NULL, LEPT_FALSE, LEPT_TRUE, LEPT_NUMBER, LEPT_STRING, LEPT_ARRAY, LEPT_OBJECT
+} lept_type;
 
-typedef struct lept_value lept_value;
+// lept_value与lept_member相互引用
 typedef struct lept_member lept_member;
+typedef struct lept_value lept_value;  
 
 struct lept_value {
-    union {
-        struct { lept_member* m; size_t size; }o;   /* object: members, member count */
-        struct { lept_value* e; size_t size; }a;    /* array:  elements, element count */
-        struct { char* s; size_t len; }s;           /* string: null-terminated string, string length */
-        double n;                                   /* number */
-    }u;
-    lept_type type;
+	union {
+		struct { lept_member* m; size_t size; }o;  
+		// json对象（键值对组成） member（一组键值对，char* ：json值）, size
+		// 值也可以是对象
+		struct { lept_value* e; size_t size; } a;  
+		struct { char* s; size_t len; } s;         
+		double n;
+	}u;
+	lept_type type;
 };
 
 struct lept_member {
-    char* k; size_t klen;   /* member key string, key string length */
-    lept_value v;           /* member value */
+	char* k; size_t klen;
+	lept_value v;
 };
 
 enum {
-    LEPT_PARSE_OK = 0,
-    LEPT_PARSE_EXPECT_VALUE,
-    LEPT_PARSE_INVALID_VALUE,
-    LEPT_PARSE_ROOT_NOT_SINGULAR,
-    LEPT_PARSE_NUMBER_TOO_BIG,
-    LEPT_PARSE_MISS_QUOTATION_MARK,
-    LEPT_PARSE_INVALID_STRING_ESCAPE,
-    LEPT_PARSE_INVALID_STRING_CHAR,
-    LEPT_PARSE_INVALID_UNICODE_HEX,
-    LEPT_PARSE_INVALID_UNICODE_SURROGATE,
-    LEPT_PARSE_MISS_COMMA_OR_SQUARE_BRACKET,
-    LEPT_PARSE_MISS_KEY,
-    LEPT_PARSE_MISS_COLON,
-    LEPT_PARSE_MISS_COMMA_OR_CURLY_BRACKET
+	LEPT_PARSE_OK = 0,
+	LEPT_PARSE_EXPECT_VALUE,
+	LEPT_PARSE_INVALID_VALUE,
+	LEPT_PARSE_ROOT_NOT_SINGULAR,
+	LEPT_PARSE_NUMBER_TOO_BIG,
+	LEPT_PARSE_MISS_QUOTATION_MARK,
+	LEPT_PARSE_INVALID_STRING_ESCAPE,
+	LEPT_PARSE_INVALID_STRING_CHAR,
+	LEPT_PARSE_INVALID_UNICODE_HEX,
+	LEPT_PARSE_INVALID_UNICODE_SURROGATE,
+	LEPT_PARSE_MISS_COMMA_OR_SQUARE_BRACKET,
+	LEPT_PARSE_MISS_KEY,     // 缺少键
+	LEPT_PARSE_MISS_COLON,   // 缺少冒号
+	LEPT_PARSE_MISS_COMMA_OR_CURLY_BRACKET  // 缺少逗号或者大括号
 };
 
-#define lept_init(v) do { (v)->type = LEPT_NULL; } while(0)
+#define lept_init(v) do{(v)->type=LEPT_NULL;}while(0)
 
 int lept_parse(lept_value* v, const char* json);
 
@@ -68,4 +73,4 @@ const char* lept_get_object_key(const lept_value* v, size_t index);
 size_t lept_get_object_key_length(const lept_value* v, size_t index);
 lept_value* lept_get_object_value(const lept_value* v, size_t index);
 
-#endif /* LEPTJSON_H__ */
+#endif // !LEPTJSON_H__
